@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import Navbar from './layouts/Navbar'
 import { Outlet } from 'react-router-dom'
+import Function from './layouts/Function'
 
 
 function App() {
@@ -10,7 +11,12 @@ function App() {
     <div>
     <nav>
         <Navbar/>
+
     </nav>
+
+    <div className='bg-color'>
+      <Function/>
+    </div>
 
       <main>
         <Outlet/>
