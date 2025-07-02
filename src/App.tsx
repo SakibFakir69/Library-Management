@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import Navbar from './layouts/Navbar'
+import { Outlet } from 'react-router-dom'
 
 
 function App() {
@@ -7,8 +8,14 @@ function App() {
 
   return (
     <div>
-      <Navbar/>
-      
+    <nav>
+        <Navbar/>
+    </nav>
+
+      <main>
+        <Outlet/>
+      </main>
+
     </div>
   )
 }
