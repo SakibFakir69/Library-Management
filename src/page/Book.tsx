@@ -4,6 +4,7 @@ import {
   useDeleteBookMutation,
   useUpdateBookMutation,
 } from "@/redux/api/allBookApi";
+import { useBorrowBooksMutation } from "@/redux/api/borrowBooksApi";
 import {
   Table,
   TableBody,
@@ -18,10 +19,21 @@ function Book() {
   const { data, isLoading } = useGetAllbooksQuery(null);
   const [deleteBook] = useDeleteBookMutation();
   const [updateBook, { isLoading: isUpdating }] = useUpdateBookMutation();
+  const [borrowBooks, { isLoading: isBorrowing }] = useBorrowBooksMutation();
 
   const [selectedBook, setSelectedBook] = useState<any | null>(null);
+  const [borrow, setBorrow] = useState<any | null>(null);
+
+  const [getBorrow, setGetBorrow] = useState<{
+    dueDate: string;
+    quantity: number;
+  }>({
+    dueDate: "",
+    quantity: 0,
+  });
 
   const modalToggleRef = useRef<HTMLInputElement>(null);
+  const modalToggleRef2 = useRef<HTMLInputElement>(null);
 
   if (isLoading) return <p>Loading...</p>;
 
@@ -40,28 +52,52 @@ function Book() {
     try {
       if (!selectedBook?._id) return;
 
-      const { _id, ...fields } = selectedBook; 
+      const { _id, ...fields } = selectedBook;
 
       await updateBook({ id: _id, data: fields }).unwrap();
 
       console.log("Updated");
 
-      // Close modal checkbox
-      if (modalToggleRef.current) {
-        modalToggleRef.current.checked = false;
-      }
       setSelectedBook(null);
     } catch (error) {
       console.log(error);
     }
   };
 
+  const handelBorrow = async () => {
+    const { quantity, dueDate } = getBorrow;
+
+    if(quantity<=books.copies){
+      alert("not enough copy aviable");
+      return;
+    }
+
+    console.log("Sending to backend:", {
+      book: borrow._id,
+      quantity,
+      dueDate,
+    });
+
+    try {
+      await borrowBooks({
+        book: borrow._id,
+        quantity,
+        dueDate,
+      }).unwrap();
+      alert("Book borrowed!");
+      setBorrow(null);
+      if (modalToggleRef2.current) {
+        modalToggleRef2.current.checked = false;
+      }
+    } catch (error: any) {
+      console.log("Borrow error:", error);
+      alert(error.data?.message || "Borrow failed");
+    }
+  };
+
   return (
     <div className="p-6">
-
-      <div>
-        <Function/>
-      </div>
+      <Function />
       <Table>
         <TableHeader>
           <TableRow>
@@ -83,7 +119,6 @@ function Book() {
                 <TableCell>{book.available ? "Yes" : "No"}</TableCell>
                 <TableCell>{book.copies}</TableCell>
                 <TableCell className="flex items-center gap-2">
-                  {/* Delete Button */}
                   <button onClick={() => handleDelete(book._id)}>
                     <img
                       width="20"
@@ -92,9 +127,18 @@ function Book() {
                       alt="Delete"
                     />
                   </button>
-                  <img width="50" height="50" src="https://img.icons8.com/fluency/50/book.png" alt="book"/>
-
-                  {/* Modal Trigger */}
+                  <label
+                    htmlFor="borrow_modal"
+                    onClick={() => setBorrow(book)}
+                    className="cursor-pointer"
+                  >
+                    <img
+                      width="20"
+                      height="20"
+                      src="https://img.icons8.com/fluency/50/book.png"
+                      alt="Borrow"
+                    />
+                  </label>
                   <label
                     htmlFor="edit_modal"
                     className="cursor-pointer"
@@ -120,7 +164,7 @@ function Book() {
         </TableBody>
       </Table>
 
-      {/* DaisyUI Modal */}
+      {/* Edit Modal */}
       <input
         type="checkbox"
         id="edit_modal"
@@ -130,7 +174,6 @@ function Book() {
       <div className="modal">
         <div className="modal-box">
           <h3 className="font-bold text-lg">Edit Book</h3>
-
           {selectedBook && (
             <div className="mt-4 space-y-2">
               <div>
@@ -155,6 +198,19 @@ function Book() {
                   }
                 />
               </div>
+
+              <div>
+                <label className="font-medium">copies:</label>
+                <input
+                  type="text"
+                  className="input input-bordered w-full"
+                  value={selectedBook.copies}
+                  onChange={(e) =>
+                    setSelectedBook({ ...selectedBook, copies: e.target.value })
+                  }
+                />
+              </div>
+
               <div>
                 <label className="font-medium">Genre:</label>
                 <input
@@ -168,15 +224,64 @@ function Book() {
               </div>
             </div>
           )}
-
           <div className="modal-action">
             <label htmlFor="edit_modal" className="btn">
               Close
             </label>
             <button className="btn btn-primary" onClick={handelUpdate}>
-              {isUpdating ? " loading" : " Update"}
+              {isUpdating ? "Loading..." : "Update"}
             </button>
           </div>
+        </div>
+      </div>
+
+      {/* Borrow Modal */}
+      <input
+        type="checkbox"
+        ref={modalToggleRef2}
+        id="borrow_modal"
+        className="modal-toggle"
+      />
+      <div className="modal">
+        <div className="modal-box">
+          {borrow && (
+            <>
+              <h3 className="font-bold text-lg">{borrow.title}</h3>
+              <p className="mb-2">Available Copies: {borrow.copies}</p>
+
+              <input
+                type="number"
+                placeholder="Quantity"
+                className="input input-bordered w-full mb-2"
+                value={getBorrow.quantity}
+                onChange={(e) =>
+                  setGetBorrow((prev) => ({
+                    ...prev,
+                    quantity: Number(e.target.value),
+                  }))
+                }
+              />
+              <input
+                type="date"
+                value={getBorrow.dueDate}
+                onChange={(e) =>
+                  setGetBorrow((prev) => ({
+                    ...prev,
+                    dueDate: e.target.value,
+                  }))
+                }
+              />
+
+              <div className="modal-action">
+                <label htmlFor="borrow_modal" className="btn">
+                  Close
+                </label>
+                <button className="btn btn-primary" onClick={handelBorrow}>
+                  {isBorrowing ? "Borrowing..." : "Borrow Now"}
+                </button>
+              </div>
+            </>
+          )}
         </div>
       </div>
     </div>
