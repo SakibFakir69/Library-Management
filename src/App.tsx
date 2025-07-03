@@ -14,9 +14,7 @@ function App() {
 
     </nav>
 
-    <div className='bg-color'>
-      <Function/>
-    </div>
+  
 
       <main>
         <Outlet/>

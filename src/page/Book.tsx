@@ -12,6 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import Function from "@/layouts/Function";
 
 function Book() {
   const { data, isLoading } = useGetAllbooksQuery(null);
@@ -39,7 +40,7 @@ function Book() {
     try {
       if (!selectedBook?._id) return;
 
-      const { _id, ...fields } = selectedBook; // separate id and updated fields
+      const { _id, ...fields } = selectedBook; 
 
       await updateBook({ id: _id, data: fields }).unwrap();
 
@@ -57,6 +58,10 @@ function Book() {
 
   return (
     <div className="p-6">
+
+      <div>
+        <Function/>
+      </div>
       <Table>
         <TableHeader>
           <TableRow>
@@ -87,6 +92,7 @@ function Book() {
                       alt="Delete"
                     />
                   </button>
+                  <img width="50" height="50" src="https://img.icons8.com/fluency/50/book.png" alt="book"/>
 
                   {/* Modal Trigger */}
                   <label

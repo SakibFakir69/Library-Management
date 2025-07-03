@@ -19,7 +19,7 @@ function Function() {
         <div className="flex justify-between gap-x-10">
 
           <Input  placeholder="🔎 Search your books" />
-         
+         <Button>Add Book</Button>
 
         </div>
       </section>

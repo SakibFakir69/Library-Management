@@ -2,7 +2,7 @@
 
 import { configureStore } from '@reduxjs/toolkit'
 import { allBookApi } from './api/allBookApi'
-
+import { borrowBookApi } from './api/borrowBooksApi'
 
 
 export const store = configureStore({
@@ -10,9 +10,11 @@ export const store = configureStore({
 
 
     [allBookApi.reducerPath]:allBookApi.reducer,
+    [borrowBookApi.reducerPath]:borrowBookApi.reducer
+    
   },
    middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(allBookApi.middleware),
+    getDefaultMiddleware().concat(allBookApi.middleware).concat(borrowBookApi.middleware),
 
 
 })
