@@ -19,7 +19,7 @@ function BookSummary() {
 
   return (
     <div className="text-black bg-[#FFFFFF] md:p-10 border borde border-stone-200">
-      <Table>
+      <Table className="border">
         <TableHeader>
           <TableRow>
             <TableHead className="">Book Title</TableHead>

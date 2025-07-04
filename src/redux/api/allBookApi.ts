@@ -3,6 +3,7 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 
+
 export const allBookApi = createApi({
   reducerPath: "allbook",
   baseQuery: fetchBaseQuery({
@@ -22,7 +23,7 @@ export const allBookApi = createApi({
       }),
       invalidatesTags: ["Books"],
     }),
-    // post borrow
+    //  update
 
     updateBook:builder.mutation({
         query:({id,data})=>({
@@ -32,9 +33,22 @@ export const allBookApi = createApi({
             
         }),
           invalidatesTags: ["Books"],
+    }),
+
+    // post book
+
+    postBooks:builder.mutation({
+      query:(data)=>({
+        url:"books",
+        method:"POST",
+        body:data,
+
+
+      }),
+      invalidatesTags:['Books']
     })
 
   }),
 });
 
-export const { useGetAllbooksQuery ,useDeleteBookMutation,useUpdateBookMutation} = allBookApi;
+export const { useGetAllbooksQuery ,useDeleteBookMutation,useUpdateBookMutation,usePostBooksMutation} = allBookApi;

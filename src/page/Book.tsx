@@ -14,6 +14,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import Function from "@/layouts/Function";
+import { Toaster } from "react-hot-toast";
+import { toast } from "react-hot-toast";
+
+import { Button } from "@/components/ui/button";
 
 function Book() {
   const { data, isLoading } = useGetAllbooksQuery(null);
@@ -55,6 +59,7 @@ function Book() {
       const { _id, ...fields } = selectedBook;
 
       await updateBook({ id: _id, data: fields }).unwrap();
+      toast.success("Updated");
 
       console.log("Updated");
 
@@ -67,8 +72,13 @@ function Book() {
   const handelBorrow = async () => {
     const { quantity, dueDate } = getBorrow;
 
-    if(quantity<=books.copies){
-      alert("not enough copy aviable");
+    if (!quantity) {
+      toast.error("enter quantity");
+      return;
+    }
+
+    if (quantity <= books.copies) {
+      toast.error("not enough copy aviable");
       return;
     }
 
@@ -84,7 +94,7 @@ function Book() {
         quantity,
         dueDate,
       }).unwrap();
-      alert("Book borrowed!");
+      toast.success("Book borrowed");
       setBorrow(null);
       if (modalToggleRef2.current) {
         modalToggleRef2.current.checked = false;
@@ -96,9 +106,11 @@ function Book() {
   };
 
   return (
-    <div className="p-6">
+    <div className="p-10 bg-stone-500/">
+      <Toaster />
+
       <Function />
-      <Table>
+      <Table className="border">
         <TableHeader>
           <TableRow>
             <TableHead>Title</TableHead>
@@ -112,14 +124,48 @@ function Book() {
         <TableBody>
           {books.length > 0 ? (
             books.map((book: any) => (
-              <TableRow key={book._id}>
+              <TableRow key={book._id} className="bg-white">
                 <TableCell>{book.title}</TableCell>
                 <TableCell>{book.author}</TableCell>
                 <TableCell>{book.genre}</TableCell>
-                <TableCell>{book.available ? "Yes" : "No"}</TableCell>
+                <TableCell>
+                  {book.available ? (
+                    <span className="text-green-500">available</span>
+                  ) : (
+                    <span className="text-red-500">unavailable</span>
+                  )}
+                </TableCell>
                 <TableCell>{book.copies}</TableCell>
                 <TableCell className="flex items-center gap-2">
-                  <button onClick={() => handleDelete(book._id)}>
+                  <button
+                    onClick={() =>
+                      toast.custom((t) => (
+                        <div className="bg-white shadow-lg rounded p-4 flex flex-col gap-2 w-[300px]">
+                          <h2 className="text-lg font-semibold">
+                            Are you sure you want to delete?
+                          </h2>
+                          <div className="flex justify-end gap-2">
+                            <button
+                              className="bg-red-500 text-white px-3 py-1 rounded"
+                              onClick={() => {
+                             
+                                handleDelete(book._id)
+                                toast.dismiss(t.id);
+                              }}
+                            >
+                              Delete
+                            </button>
+                            <button
+                              className="bg-gray-300 px-3 py-1 rounded"
+                              onClick={() => toast.dismiss(t.id)}
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        </div>
+                      ))
+                    }
+                  >
                     <img
                       width="20"
                       height="20"
@@ -127,6 +173,7 @@ function Book() {
                       alt="Delete"
                     />
                   </button>
+
                   <label
                     htmlFor="borrow_modal"
                     onClick={() => setBorrow(book)}
@@ -180,7 +227,7 @@ function Book() {
                 <label className="font-medium">Title:</label>
                 <input
                   type="text"
-                  className="input input-bordered w-full"
+                  className="input input-bordered w-full border"
                   value={selectedBook.title}
                   onChange={(e) =>
                     setSelectedBook({ ...selectedBook, title: e.target.value })
@@ -191,7 +238,7 @@ function Book() {
                 <label className="font-medium">Author:</label>
                 <input
                   type="text"
-                  className="input input-bordered w-full"
+                  className="input input-bordered w-full border"
                   value={selectedBook.author}
                   onChange={(e) =>
                     setSelectedBook({ ...selectedBook, author: e.target.value })
@@ -203,7 +250,7 @@ function Book() {
                 <label className="font-medium">copies:</label>
                 <input
                   type="text"
-                  className="input input-bordered w-full"
+                  className="input input-bordered w-full border"
                   value={selectedBook.copies}
                   onChange={(e) =>
                     setSelectedBook({ ...selectedBook, copies: e.target.value })
@@ -213,14 +260,29 @@ function Book() {
 
               <div>
                 <label className="font-medium">Genre:</label>
-                <input
-                  type="text"
-                  className="input input-bordered w-full"
-                  value={selectedBook.genre}
-                  onChange={(e) =>
-                    setSelectedBook({ ...selectedBook, genre: e.target.value })
-                  }
-                />
+                <fieldset className="fieldset w-2/3 border">
+                  <select
+                    value={selectedBook.genre}
+                    onChange={(e) =>
+                      setSelectedBook({
+                        ...selectedBook,
+                        genre: e.target.value,
+                      })
+                    }
+                    defaultValue={selectedBook.genre}
+                    className="select w-full"
+                  >
+                    <option value="" disabled>
+                      Pick
+                    </option>
+                    <option value="FICTION">FICTION</option>
+                    <option value="NON_FICTION">NON_FICTION</option>
+                    <option value="SCIENCE">SCIENCE</option>
+                    <option value="HISTORY">HISTORY</option>
+                    <option value="BIOGRAPHY">BIOGRAPHY</option>
+                    <option value="FANTASY">FANTASY</option>
+                  </select>
+                </fieldset>
               </div>
             </div>
           )}
@@ -252,7 +314,7 @@ function Book() {
               <input
                 type="number"
                 placeholder="Quantity"
-                className="input input-bordered w-full mb-2"
+                className="input input-bordered w-full mb-2 border"
                 value={getBorrow.quantity}
                 onChange={(e) =>
                   setGetBorrow((prev) => ({
@@ -263,6 +325,7 @@ function Book() {
               />
               <input
                 type="date"
+                className="border"
                 value={getBorrow.dueDate}
                 onChange={(e) =>
                   setGetBorrow((prev) => ({
