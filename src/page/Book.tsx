@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import  { useState, useRef } from "react";
 import {
   useGetAllbooksQuery,
   useDeleteBookMutation,
@@ -17,24 +17,20 @@ import Function from "@/layouts/Function";
 import { Toaster } from "react-hot-toast";
 import { toast } from "react-hot-toast";
 
-import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 function Book() {
-  const { data, isLoading } = useGetAllbooksQuery(null);
+  const goSummary = useNavigate();
+  const { data, isLoading ,refetch} = useGetAllbooksQuery(null);
   const [deleteBook] = useDeleteBookMutation();
   const [updateBook, { isLoading: isUpdating }] = useUpdateBookMutation();
   const [borrowBooks, { isLoading: isBorrowing }] = useBorrowBooksMutation();
 
   const [selectedBook, setSelectedBook] = useState<any | null>(null);
-  const [borrow, setBorrow] = useState<any | null>(null);
+  // const [borrow, setBorrow] = useState<any | null>(null);
 
-  const [getBorrow, setGetBorrow] = useState<{
-    dueDate: string;
-    quantity: number;
-  }>({
-    dueDate: "",
-    quantity: 0,
-  });
+  const [getBorrow, setGetBorrow] =useState<any | null>(null);
+
 
   const modalToggleRef = useRef<HTMLInputElement>(null);
   const modalToggleRef2 = useRef<HTMLInputElement>(null);
@@ -63,39 +59,52 @@ function Book() {
 
       console.log("Updated");
 
+        if (modalToggleRef.current) {
+        modalToggleRef.current.checked = false;
+      }
+
       setSelectedBook(null);
     } catch (error) {
       console.log(error);
     }
   };
 
+ 
+
+  console.log(getBorrow);
+
   const handelBorrow = async () => {
+    console.log(getBorrow);
     const { quantity, dueDate } = getBorrow;
 
+    if (!getBorrow?._id) {
+      toast.error("Book ID is missing");
+      return;
+    }
+
     if (!quantity) {
-      toast.error("enter quantity");
+      toast.error("Enter quantity");
       return;
     }
 
-    if (quantity <= books.copies) {
-      toast.error("not enough copy aviable");
+    if (quantity > books.copies) {
+      toast.error("Not enough copies available");
       return;
     }
 
-    console.log("Sending to backend:", {
-      book: borrow._id,
-      quantity,
-      dueDate,
-    });
+    console.log("Borrowing book:", getBorrow._id);
 
     try {
       await borrowBooks({
-        book: borrow._id,
-        quantity,
-        dueDate,
+        bookId: getBorrow._id,
+
+        data: { quantity, dueDate },
       }).unwrap();
+
       toast.success("Book borrowed");
-      setBorrow(null);
+      goSummary("/book-summary");
+         refetch();
+      setGetBorrow(null);
       if (modalToggleRef2.current) {
         modalToggleRef2.current.checked = false;
       }
@@ -129,7 +138,7 @@ function Book() {
                 <TableCell>{book.author}</TableCell>
                 <TableCell>{book.genre}</TableCell>
                 <TableCell>
-                  {book.available ? (
+                  {book.available>0? (
                     <span className="text-green-500">available</span>
                   ) : (
                     <span className="text-red-500">unavailable</span>
@@ -148,8 +157,7 @@ function Book() {
                             <button
                               className="bg-red-500 text-white px-3 py-1 rounded"
                               onClick={() => {
-                             
-                                handleDelete(book._id)
+                                handleDelete(book._id);
                                 toast.dismiss(t.id);
                               }}
                             >
@@ -176,7 +184,7 @@ function Book() {
 
                   <label
                     htmlFor="borrow_modal"
-                    onClick={() => setBorrow(book)}
+                    onClick={() => setGetBorrow(book)}
                     className="cursor-pointer"
                   >
                     <img
@@ -269,7 +277,6 @@ function Book() {
                         genre: e.target.value,
                       })
                     }
-                    defaultValue={selectedBook.genre}
                     className="select w-full"
                   >
                     <option value="" disabled>
@@ -284,7 +291,11 @@ function Book() {
                   </select>
                 </fieldset>
               </div>
+
+       
             </div>
+
+            
           )}
           <div className="modal-action">
             <label htmlFor="edit_modal" className="btn">
@@ -294,6 +305,7 @@ function Book() {
               {isUpdating ? "Loading..." : "Update"}
             </button>
           </div>
+          
         </div>
       </div>
 
@@ -306,29 +318,31 @@ function Book() {
       />
       <div className="modal">
         <div className="modal-box">
-          {borrow && (
+          {getBorrow && (
             <>
-              <h3 className="font-bold text-lg">{borrow.title}</h3>
-              <p className="mb-2">Available Copies: {borrow.copies}</p>
+            <h1 className="md:text-2xl font-semibold"> Borrow <span className="text-green-400"> Now </span></h1>
+              {/* <h3 className="font-bold text-lg">{getBorrow.title}</h3>
+              <p className="mb-2">Available Copies: {getBorrow.copies}</p> */}
 
               <input
-                type="number"
+                type="text"
                 placeholder="Quantity"
-                className="input input-bordered w-full mb-2 border"
+                className="input input-bordered w-full mb-2 border mt-4"
                 value={getBorrow.quantity}
                 onChange={(e) =>
-                  setGetBorrow((prev) => ({
+                  setGetBorrow((prev:any) => ({
                     ...prev,
                     quantity: Number(e.target.value),
                   }))
                 }
               />
+
               <input
                 type="date"
                 className="border"
                 value={getBorrow.dueDate}
                 onChange={(e) =>
-                  setGetBorrow((prev) => ({
+                  setGetBorrow((prev:any) => ({
                     ...prev,
                     dueDate: e.target.value,
                   }))

@@ -2,8 +2,6 @@
 
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
-
-
 export const allBookApi = createApi({
   reducerPath: "allbook",
   baseQuery: fetchBaseQuery({
@@ -25,30 +23,31 @@ export const allBookApi = createApi({
     }),
     //  update
 
-    updateBook:builder.mutation({
-        query:({id,data})=>({
-            url:`books/${id}`,
-            method:"PUT",
-            body:data,
-            
-        }),
-          invalidatesTags: ["Books"],
+    updateBook: builder.mutation({
+      query: ({ id, data }) => ({
+        url: `/edit-book/${id}`, // ✅ Use correct REST path
+        method: "PUT",
+        body: data,
+      }),
+      invalidatesTags: ["Books"],
     }),
 
     // post book
 
-    postBooks:builder.mutation({
-      query:(data)=>({
-        url:"books",
-        method:"POST",
-        body:data,
-
-
+    postBooks: builder.mutation({
+      query: (data) => ({
+        url: "/create-book",
+        method: "POST",
+        body: data,
       }),
-      invalidatesTags:['Books']
-    })
-
+      invalidatesTags: ["Books"],
+    }),
   }),
 });
 
-export const { useGetAllbooksQuery ,useDeleteBookMutation,useUpdateBookMutation,usePostBooksMutation} = allBookApi;
+export const {
+  useGetAllbooksQuery,
+  useDeleteBookMutation,
+  useUpdateBookMutation,
+  usePostBooksMutation,
+} = allBookApi;

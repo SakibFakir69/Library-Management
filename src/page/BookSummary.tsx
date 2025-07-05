@@ -1,9 +1,10 @@
-import React from "react";
+
+
 import { useGetborrowBooksQuery } from "@/redux/api/borrowBooksApi";
 
 import {
   TableBody,
-  TableCaption,
+
   TableCell,
   TableHead,
   TableHeader,
@@ -12,7 +13,7 @@ import {
 } from "@/components/ui/table";
 
 function BookSummary() {
-  const { data, isError, error, isLoading } = useGetborrowBooksQuery(null);
+  const { data, isLoading } = useGetborrowBooksQuery(null);
   console.log(data);
 
   const borrowData = data?.data || [];

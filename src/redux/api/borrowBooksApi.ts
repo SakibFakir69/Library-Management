@@ -7,12 +7,12 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 export const borrowBookApi= createApi({
     reducerPath:'borrowBook',
-    baseQuery:fetchBaseQuery({baseUrl:'https://library-api-7qik.onrender.com/api/'
+    baseQuery:fetchBaseQuery({baseUrl:'https://library-api-7qik.onrender.com/api/borrow'
     }),
-    tagTypes:['Borrow'],
+    tagTypes:['Borrow','Books'],
     endpoints:(builder)=>({
         getborrowBooks:builder.query({
-            query:()=> '/borrow'
+            query:()=> '/borrow-summary'
 
         }),
 
@@ -20,15 +20,16 @@ export const borrowBookApi= createApi({
         // borrow post 
 
         borrowBooks:builder.mutation({
-            query:({ quantity, dueDate,book})=>({
-                url:'borrow',
+            query:({bookId,data})=>({
+                url:`/${bookId}`,
                 method:'POST',
-                body:{ quantity, dueDate,book},
+                body:data,
 
                 
             }),
-            invalidatesTags:['Borrow'],
+            invalidatesTags:['Borrow','Books'],
             // 
+        
 
 
         })
