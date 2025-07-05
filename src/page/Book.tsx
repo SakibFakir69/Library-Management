@@ -43,6 +43,7 @@ function Book() {
     try {
       await deleteBook(id).unwrap();
       console.log("Deleted successfully");
+      toast.success("Deleted successfully");
     } catch (error) {
       console.error("Delete error:", error);
     }
@@ -62,6 +63,7 @@ function Book() {
         if (modalToggleRef.current) {
         modalToggleRef.current.checked = false;
       }
+      toast.success("Updat successfully")
 
       setSelectedBook(null);
     } catch (error) {

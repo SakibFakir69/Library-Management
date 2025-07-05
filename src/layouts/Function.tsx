@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { usePostBooksMutation } from "@/redux/api/allBookApi";
 import { Input } from "@/components/ui/input";
 import { useRef } from "react";
+import toast, { Toaster } from "react-hot-toast";
 
 function Function() {
 
@@ -32,6 +33,7 @@ function Function() {
 
     try {
       await postBooks(finalData).unwrap();
+      toast.success("Add successfully");
 
       // Close modal after successful submit
       useModalRef.current?.close();
@@ -55,7 +57,7 @@ function Function() {
           >
             Add Book
           </button>
-
+ <Toaster/>
           <dialog ref={useModalRef} id="my_modal_1" className="modal">
             <div className="modal-box">
               <div className="modal-action p-2 ">
