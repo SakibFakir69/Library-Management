@@ -1,10 +1,17 @@
+import Function from "@/layouts/Function"
 
 
 
 
 function AddBook() {
   return (
-    <div>AddBook</div>
+    <div className="min-h-screen">
+
+     <section className="w-full flex justify-center items-center">
+       <Function/>
+     </section>
+
+    </div>
   )
 }
 

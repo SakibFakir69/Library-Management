@@ -19,7 +19,7 @@ function BookSummary() {
   const borrowData = data?.data || [];
 
   return (
-    <div className="text-black bg-[#FFFFFF] md:p-10 border borde border-stone-200">
+    <div className="text-black bg-[#FFFFFF] md:p-10 border borde border-stone-200 min-h-screen">
       <Table className="border">
         <TableHeader>
           <TableRow>

@@ -1,4 +1,4 @@
-import  { useState, useRef } from "react";
+import { useState, useRef } from "react";
 import {
   useGetAllbooksQuery,
   useDeleteBookMutation,
@@ -21,7 +21,7 @@ import { useNavigate } from "react-router-dom";
 
 function Book() {
   const goSummary = useNavigate();
-  const { data, isLoading ,refetch} = useGetAllbooksQuery(null);
+  const { data, isLoading, refetch } = useGetAllbooksQuery(null);
   const [deleteBook] = useDeleteBookMutation();
   const [updateBook, { isLoading: isUpdating }] = useUpdateBookMutation();
   const [borrowBooks, { isLoading: isBorrowing }] = useBorrowBooksMutation();
@@ -29,13 +29,17 @@ function Book() {
   const [selectedBook, setSelectedBook] = useState<any | null>(null);
   // const [borrow, setBorrow] = useState<any | null>(null);
 
-  const [getBorrow, setGetBorrow] =useState<any | null>(null);
-
+  const [getBorrow, setGetBorrow] = useState<any | null>(null);
 
   const modalToggleRef = useRef<HTMLInputElement>(null);
   const modalToggleRef2 = useRef<HTMLInputElement>(null);
 
-  if (isLoading) return <p>Loading...</p>;
+  if (isLoading)
+    return (
+      <div className="w-full flex justify-center items-center">
+        <span className="loading loading-ring size-10 py-10"></span>
+      </div>
+    );
 
   const books = data?.data || [];
 
@@ -60,18 +64,16 @@ function Book() {
 
       console.log("Updated");
 
-        if (modalToggleRef.current) {
+      if (modalToggleRef.current) {
         modalToggleRef.current.checked = false;
       }
-      toast.success("Updat successfully")
+      toast.success("Updat successfully");
 
       setSelectedBook(null);
     } catch (error) {
       console.log(error);
     }
   };
-
- 
 
   console.log(getBorrow);
 
@@ -105,7 +107,7 @@ function Book() {
 
       toast.success("Book borrowed");
       goSummary("/book-summary");
-         refetch();
+      refetch();
       setGetBorrow(null);
       if (modalToggleRef2.current) {
         modalToggleRef2.current.checked = false;
@@ -117,7 +119,7 @@ function Book() {
   };
 
   return (
-    <div className="p-10 bg-stone-500/">
+    <div className="md:p-10 p-2 min-h-screen">
       <Toaster />
 
       <Function />
@@ -140,7 +142,7 @@ function Book() {
                 <TableCell>{book.author}</TableCell>
                 <TableCell>{book.genre}</TableCell>
                 <TableCell>
-                  {book.available>0? (
+                  {book.available > 0 ? (
                     <span className="text-green-500">available</span>
                   ) : (
                     <span className="text-red-500">unavailable</span>
@@ -293,11 +295,7 @@ function Book() {
                   </select>
                 </fieldset>
               </div>
-
-       
             </div>
-
-            
           )}
           <div className="modal-action">
             <label htmlFor="edit_modal" className="btn">
@@ -307,7 +305,6 @@ function Book() {
               {isUpdating ? "Loading..." : "Update"}
             </button>
           </div>
-          
         </div>
       </div>
 
@@ -322,7 +319,10 @@ function Book() {
         <div className="modal-box">
           {getBorrow && (
             <>
-            <h1 className="md:text-2xl font-semibold"> Borrow <span className="text-green-400"> Now </span></h1>
+              <h1 className="md:text-2xl font-semibold">
+                {" "}
+                Borrow <span className="text-green-400"> Now </span>
+              </h1>
               {/* <h3 className="font-bold text-lg">{getBorrow.title}</h3>
               <p className="mb-2">Available Copies: {getBorrow.copies}</p> */}
 
@@ -332,7 +332,7 @@ function Book() {
                 className="input input-bordered w-full mb-2 border mt-4"
                 value={getBorrow.quantity}
                 onChange={(e) =>
-                  setGetBorrow((prev:any) => ({
+                  setGetBorrow((prev: any) => ({
                     ...prev,
                     quantity: Number(e.target.value),
                   }))
@@ -344,7 +344,7 @@ function Book() {
                 className="border"
                 value={getBorrow.dueDate}
                 onChange={(e) =>
-                  setGetBorrow((prev:any) => ({
+                  setGetBorrow((prev: any) => ({
                     ...prev,
                     dueDate: e.target.value,
                   }))

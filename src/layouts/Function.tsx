@@ -1,4 +1,3 @@
-
 import { type PostTypes } from "@/types/postTypes";
 
 import { useForm } from "react-hook-form";
@@ -6,13 +5,16 @@ import { usePostBooksMutation } from "@/redux/api/allBookApi";
 import { Input } from "@/components/ui/input";
 import { useRef } from "react";
 import toast, { Toaster } from "react-hot-toast";
+import { useLocation } from "react-router-dom";
 
 function Function() {
-
   // loading , modal , ui , ux , logic , . Borrow Book , /borrow-summary
 
+  const [postBooks] = usePostBooksMutation();
 
-  const [postBooks, ] = usePostBooksMutation();
+  // location
+
+  const {pathname} = useLocation();
 
   // Correct ref type for <dialog>
   const useModalRef = useRef<HTMLDialogElement>(null);
@@ -24,12 +26,10 @@ function Function() {
   } = useForm<PostTypes>();
 
   const onSubmit = async (data: PostTypes) => {
- 
-
-     const finalData = {
-    ...data,
-    available: true, 
-  };
+    const finalData = {
+      ...data,
+      available: true,
+    };
 
     try {
       await postBooks(finalData).unwrap();
@@ -37,7 +37,8 @@ function Function() {
 
       // Close modal after successful submit
       useModalRef.current?.close();
-    } catch (error) {
+    } catch (error:any) {
+      toast.error(error.name  || " Book creation failed")
       console.log(error);
     }
   };
@@ -45,23 +46,36 @@ function Function() {
   return (
     <div className="p-10 ">
       <section className="flex justify-between">
-        <div className="md:text-4xl text-xl font-semibold"> Library Books</div>
+
+        {
+          pathname!=='/add-book'&& <div className="md:text-4xl text-xl font-semibold"> Library Books</div>
+        }
 
         <div className="flex justify-between gap-x-10">
-          <Input placeholder="🔎 Search your books" />
+         
+
+           {
+          pathname!=='/add-book'&&  <Input placeholder="🔎 Search your books" />
+        }
+
+
+          
+
+          
+          
+
 
           {/* Use ref to open modal */}
           <button
-            className="btn "
+            className="btn bg-blue-600 text-white px-8 py-2 rounded-2xl"
             onClick={() => useModalRef.current?.showModal()}
           >
             Add Book
           </button>
- <Toaster/>
+          <Toaster />
           <dialog ref={useModalRef} id="my_modal_1" className="modal">
             <div className="modal-box">
               <div className="modal-action p-2 ">
-
                 <div className="flex flex-col justify-center items-center w-full ">
                   <form
                     onSubmit={handleSubmit(onSubmit)}
@@ -78,7 +92,9 @@ function Function() {
 
                     <input
                       className="md:w-2/3 px-10 border py-2"
-                      {...register("author", { required: "Author is required" })}
+                      {...register("author", {
+                        required: "Author is required",
+                      })}
                       placeholder="Enter Author"
                     />
                     {errors.author && (
@@ -104,12 +120,16 @@ function Function() {
                       placeholder="Enter your description"
                     />
                     {errors.description && (
-                      <p className="text-red-500">{errors.description.message}</p>
+                      <p className="text-red-500">
+                        {errors.description.message}
+                      </p>
                     )}
 
                     <fieldset className="fieldset md:w-2/3 border">
                       <select
-                        {...register("genre", { required: "Genre is required" })}
+                        {...register("genre", {
+                          required: "Genre is required",
+                        })}
                         defaultValue=""
                         className="select w-full"
                       >
@@ -141,11 +161,11 @@ function Function() {
                     )}
 
                     <div className="flex gap-2">
-                      <input className="btn" type="submit" />
+                      <input className="btn px-8 py-1 bg-green-500 text-white rounded-xl" type="submit"  />
 
                       <button
                         type="button"
-                        className="btn"
+                        className="btn px-8 py-1 bg-warning text-white rounded-xl"
                         onClick={() => useModalRef.current?.close()}
                       >
                         Close
